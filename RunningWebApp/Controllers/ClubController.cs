@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RunningWebApp.Data;
+using RunningWebApp.Models;
 
 namespace RunningWebApp.Controllers
 {
@@ -15,8 +17,14 @@ namespace RunningWebApp.Controllers
         }
         public IActionResult Index() // Controller
         {
-            var clubs = _context.Clubs.ToList(); // Model
+            List<Club> clubs = _context.Clubs.ToList(); // Model
             return View(clubs); // View
+        }
+
+        public IActionResult Detail(int id) 
+        {
+            Club club =  _context.Clubs.Include(a => a.Address).FirstOrDefault(c => c.Id == id); // Return the first club that has given ID
+            return View(club);
         }
     }
 }
