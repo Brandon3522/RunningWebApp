@@ -11,6 +11,7 @@ namespace RunningWebApp.Data
             
         }
 
+        // Database tables
         public DbSet<Race> Races { get; set; }
         public DbSet<Club> Clubs { get; set; }
         public DbSet<Address> Addresses { get; set; }

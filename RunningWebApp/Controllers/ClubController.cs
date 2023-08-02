@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RunningWebApp.Data;
+using RunningWebApp.Interfaces;
 using RunningWebApp.Models;
 
 namespace RunningWebApp.Controllers
@@ -8,22 +9,21 @@ namespace RunningWebApp.Controllers
     public class ClubController : Controller
     {
 
-        // Context == database
-        private readonly ApplicationDbContext _context;
+		private readonly IClubRepository _clubRepository;
 
-        public ClubController(ApplicationDbContext context)
+		public ClubController(IClubRepository clubRepository)
         {
-            this._context = context;
-        }
-        public IActionResult Index() // Controller
+			this._clubRepository = clubRepository;
+		}
+        public async Task<IActionResult> Index() // Controller
         {
-            List<Club> clubs = _context.Clubs.ToList(); // Model
+            IEnumerable<Club> clubs = await _clubRepository.GetAll(); // Model
             return View(clubs); // View
         }
 
-        public IActionResult Detail(int id) 
+        public async Task<IActionResult> Detail(int id) 
         {
-            Club club =  _context.Clubs.Include(a => a.Address).FirstOrDefault(c => c.Id == id); // Return the first club that has given ID
+            Club club = await _clubRepository.GetByIdAsync(id); // Return the first club that has given ID
             return View(club);
         }
     }
