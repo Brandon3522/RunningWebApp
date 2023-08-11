@@ -4,16 +4,21 @@ using Microsoft.EntityFrameworkCore.Query.Internal;
 using RunningWebApp.Data;
 using RunningWebApp.Interfaces;
 using RunningWebApp.Models;
+using RunningWebApp.Repositories;
+using RunningWebApp.Services;
+using RunningWebApp.ViewModels;
 
 namespace RunningWebApp.Controllers
 {
     public class RaceController : Controller
     {
 		private readonly IRaceRepository _raceRepository;
+		private readonly IPhotoService _photoService;
 
-		public RaceController(IRaceRepository raceRepository) 
+		public RaceController(IRaceRepository raceRepository, IPhotoService photoService) 
         {
 			this._raceRepository = raceRepository;
+			this._photoService = photoService;
 		}
         public async Task<IActionResult> Index()
         {
@@ -33,15 +38,33 @@ namespace RunningWebApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Race race)
+        public async Task<IActionResult> Create(CreateRaceViewModel RaceVM)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                return View(race);
+				var result = await _photoService.AddPhotoAsync(RaceVM.Image);
+
+				var race = new Race
+				{
+					Title = RaceVM.Title,
+					Description = RaceVM.Description,
+					Image = result.Url.ToString(),
+					Address = new Address
+					{
+						Street = RaceVM.Address.Street,
+						City = RaceVM.Address.City,
+						State = RaceVM.Address.State,
+					}
+				};
+				_raceRepository.Add(race);
+				return RedirectToAction("Index");
+			}
+            else
+            {
+                ModelState.AddModelError("", "Photo upload failed");
             }
 
-            _raceRepository.Add(race);
-            return RedirectToAction("Index");
+            return View(RaceVM);
         }
     }
 }
