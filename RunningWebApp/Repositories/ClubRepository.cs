@@ -38,6 +38,11 @@ namespace RunningWebApp.Repositories
 			return await _context.Clubs.Include(i => i.Address).FirstOrDefaultAsync(i => i.Id == id);
 		}
 
+		public async Task<Club> GetByIdAsyncNoTracking(int id)
+		{
+			return await _context.Clubs.Include(i => i.Address).AsNoTracking().FirstOrDefaultAsync(i => i.Id == id);
+		}
+
 		public async Task<IEnumerable<Club>> GetClubByCity(string city)
 		{
 			// Search 
@@ -50,7 +55,7 @@ namespace RunningWebApp.Repositories
 			return saved > 0 ? true : false; // Change return to boolean
 		}
 
-		public bool update(Club club)
+		public bool Update(Club club)
 		{
 			_context.Update(club);
 			return Save();
