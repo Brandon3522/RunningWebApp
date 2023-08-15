@@ -40,13 +40,18 @@ namespace RunningWebApp.Repositories
 			return await _context.Races.Include(i => i.Address).FirstOrDefaultAsync(i => i.Id == id);
 		}
 
+		public async Task<Race> GetByIdAsyncNoTracking(int id)
+		{
+			return await _context.Races.Include(i => i.Address).AsNoTracking().FirstOrDefaultAsync(i => i.Id == id);
+		}
+
 		public bool Save()
 		{
 			var saved = _context.SaveChanges();
 			return saved > 0 ? true : false;
 		}
 
-		public bool update(Race race)
+		public bool Update(Race race)
 		{
 			_context.Update(race);
 			return Save();
