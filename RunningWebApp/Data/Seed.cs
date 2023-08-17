@@ -112,7 +112,7 @@ namespace RunGroopWebApp.Data
             }
         }
 
-        /*public static async Task SeedUsersAndRolesAsync(IApplicationBuilder applicationBuilder)
+        public static async Task SeedUsersAndRolesAsync(IApplicationBuilder applicationBuilder)
         {
             using (var serviceScope = applicationBuilder.ApplicationServices.CreateScope())
             {
@@ -126,14 +126,14 @@ namespace RunGroopWebApp.Data
 
                 //Users
                 var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
-                string adminUserEmail = "teddysmithdeveloper@gmail.com";
+                string adminUserEmail = "developer@gmail.com";
 
                 var adminUser = await userManager.FindByEmailAsync(adminUserEmail);
                 if (adminUser == null)
                 {
                     var newAdminUser = new AppUser()
                     {
-                        UserName = "teddysmithdev",
+                        UserName = "dev",
                         Email = adminUserEmail,
                         EmailConfirmed = true,
                         Address = new Address()
@@ -168,6 +168,6 @@ namespace RunGroopWebApp.Data
                     await userManager.AddToRoleAsync(newAppUser, UserRoles.User);
                 }
             }
-        }*/
+        }
     }
 }
