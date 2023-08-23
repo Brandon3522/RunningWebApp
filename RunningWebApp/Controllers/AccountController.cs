@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RunningWebApp.Data;
 using RunningWebApp.Models;
 using RunningWebApp.ViewModels;
+using System.Runtime.InteropServices;
 
 namespace RunningWebApp.Controllers
 {
@@ -60,5 +61,53 @@ namespace RunningWebApp.Controllers
 			TempData["Error"] = "Wrong password or email"; // Not good practice
 			return View(loginVM);
 		}
-	}
+
+        // Functions as HTTP GET request
+        public IActionResult Register()
+        {
+            // Keep values on page refresh
+            var response = new RegisterViewModel();
+            return View(response);
+        }
+
+		[HttpPost]
+		public async Task<IActionResult> Register(RegisterViewModel registerVM)
+		{
+			if (!ModelState.IsValid)
+			{
+				return View(registerVM);
+			}
+
+			var user = await _userManager.FindByEmailAsync(registerVM.EmailAddress);
+			// Check for email 
+			if (user != null)
+			{
+				TempData["Error"] = "This email already exists";
+				return View(registerVM);
+			}
+
+			var newUser = new AppUser()
+			{
+				Email = registerVM.EmailAddress,
+				UserName = registerVM.EmailAddress,
+			};
+
+			var newUserResponse = await _userManager.CreateAsync(newUser, registerVM.Password);
+
+			// Assign to user role
+			if (newUserResponse.Succeeded)
+			{
+				await _userManager.AddToRoleAsync(newUser, UserRoles.User);
+			}
+
+            return RedirectToAction("Index", "Race");
+        }
+
+		[HttpPost]
+		public async Task<IActionResult> Logout()
+		{
+			await _signInManager.SignOutAsync();
+			return RedirectToAction("Index", "Race");
+		}
+    }
 }
