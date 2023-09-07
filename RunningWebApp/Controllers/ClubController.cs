@@ -128,5 +128,36 @@ namespace RunningWebApp.Controllers
 
 
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var club = await _clubRepository.GetByIdAsync(id);
+
+            Console.WriteLine("In delete function");
+
+            if (club == null)
+            {
+                return View("Error");
+            }
+
+            return View(club);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public async Task<IActionResult> DeleteClub(int id)
+        {
+            var club = await _clubRepository.GetByIdAsync(id);
+
+            Console.WriteLine("In delete club function");
+
+            if (club == null)
+            {
+                return View("Error");
+            }
+
+            _clubRepository.Delete(club);
+            return RedirectToAction("Index");
+        }
     }
 }

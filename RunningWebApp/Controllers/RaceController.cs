@@ -132,5 +132,34 @@ namespace RunningWebApp.Controllers
                 return View(raceVM);
             }
         }
+
+		[HttpGet]
+		public async Task<IActionResult> Delete(int id)
+		{
+			var race = await _raceRepository.GetByIdAsync(id);
+
+			if (race == null)
+			{
+				return View("Error");
+			}
+
+			return View(race);
+		}
+
+        [HttpPost, ActionName("Delete")]
+        public async Task<IActionResult> DeleteRace(int id)
+        {
+            var race = await _raceRepository.GetByIdAsync(id);
+
+            Console.WriteLine("In delete race function");
+
+            if (race == null)
+            {
+                return View("Error");
+            }
+
+            _raceRepository.Delete(race);
+            return RedirectToAction("Index");
+        }
     }
 }
