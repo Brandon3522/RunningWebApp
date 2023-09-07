@@ -12,12 +12,14 @@ namespace RunningWebApp.Controllers
 
 		private readonly IClubRepository _clubRepository;
 		private readonly IPhotoService _photoService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-		public ClubController(IClubRepository clubRepository, IPhotoService photoService)
+		public ClubController(IClubRepository clubRepository, IPhotoService photoService, IHttpContextAccessor httpContextAccessor)
         {
 			this._clubRepository = clubRepository;
 			this._photoService = photoService;
-		}
+            this._httpContextAccessor = httpContextAccessor;
+        }
         public async Task<IActionResult> Index() // Controller
         {
             IEnumerable<Club> clubs = await _clubRepository.GetAll(); // Model
@@ -32,7 +34,9 @@ namespace RunningWebApp.Controllers
 
         public IActionResult Create()
         {
-            return View();
+            var currentUserId = _httpContextAccessor.HttpContext?.User.GetUserId(); // Retrieve the user id without making call to database
+            var createClubViewModel = new CreateClubViewModel { AppUserId = currentUserId };
+            return View(createClubViewModel);
         }
 
         [HttpPost]
@@ -47,6 +51,7 @@ namespace RunningWebApp.Controllers
                     Title = clubVM.Title,
                     Description = clubVM.Description,
                     Image = result.Url.ToString(),
+                    AppUserId = clubVM.AppUserId,
                     Address = new Address
                     {
 						Street = clubVM.Address.Street,

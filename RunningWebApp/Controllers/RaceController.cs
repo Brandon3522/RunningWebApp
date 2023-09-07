@@ -14,12 +14,14 @@ namespace RunningWebApp.Controllers
     {
 		private readonly IRaceRepository _raceRepository;
 		private readonly IPhotoService _photoService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-		public RaceController(IRaceRepository raceRepository, IPhotoService photoService) 
+        public RaceController(IRaceRepository raceRepository, IPhotoService photoService, IHttpContextAccessor httpContextAccessor) 
         {
 			this._raceRepository = raceRepository;
 			this._photoService = photoService;
-		}
+            this._httpContextAccessor = httpContextAccessor;
+        }
         public async Task<IActionResult> Index()
         {
             IEnumerable<Race> races = await _raceRepository.GetAll();
@@ -34,26 +36,29 @@ namespace RunningWebApp.Controllers
 
         public async Task<IActionResult> Create()
         {
-            return View();
+            var currentUserId = _httpContextAccessor.HttpContext?.User.GetUserId();
+            var createRaceViewModel = new CreateRaceViewModel { AppUserId = currentUserId };
+            return View(createRaceViewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateRaceViewModel RaceVM)
+        public async Task<IActionResult> Create(CreateRaceViewModel raceVM)
         {
             if (ModelState.IsValid)
             {
-				var result = await _photoService.AddPhotoAsync(RaceVM.Image);
+				var result = await _photoService.AddPhotoAsync(raceVM.Image);
 
 				var race = new Race
 				{
-					Title = RaceVM.Title,
-					Description = RaceVM.Description,
+					Title = raceVM.Title,
+					Description = raceVM.Description,
 					Image = result.Url.ToString(),
+                    AppUserId = raceVM.AppUserId,
 					Address = new Address
 					{
-						Street = RaceVM.Address.Street,
-						City = RaceVM.Address.City,
-						State = RaceVM.Address.State,
+						Street = raceVM.Address.Street,
+						City = raceVM.Address.City,
+						State = raceVM.Address.State,
 					}
 				};
 				_raceRepository.Add(race);
@@ -64,7 +69,7 @@ namespace RunningWebApp.Controllers
                 ModelState.AddModelError("", "Photo upload failed");
             }
 
-            return View(RaceVM);
+            return View(raceVM);
         }
 
         public async Task<IActionResult> Edit(int id)
