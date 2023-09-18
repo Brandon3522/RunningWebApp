@@ -139,8 +139,6 @@ namespace RunningWebApp.Controllers
         {
             var club = await _clubRepository.GetByIdAsync(id);
 
-            Console.WriteLine("In delete function");
-
             if (club == null)
             {
                 return View("Error");
@@ -154,7 +152,6 @@ namespace RunningWebApp.Controllers
         {
             var club = await _clubRepository.GetByIdAsync(id);
 
-            Console.WriteLine("In delete club function");
 
             if (club == null)
             {
