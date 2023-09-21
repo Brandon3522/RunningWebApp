@@ -10,14 +10,14 @@ namespace RunningWebApp.Controllers
     public class ClubController : Controller
     {
 
-		private readonly IClubRepository _clubRepository;
-		private readonly IPhotoService _photoService;
+        private readonly IClubRepository _clubRepository;
+        private readonly IPhotoService _photoService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-		public ClubController(IClubRepository clubRepository, IPhotoService photoService, IHttpContextAccessor httpContextAccessor)
+        public ClubController(IClubRepository clubRepository, IPhotoService photoService, IHttpContextAccessor httpContextAccessor)
         {
-			this._clubRepository = clubRepository;
-			this._photoService = photoService;
+            this._clubRepository = clubRepository;
+            this._photoService = photoService;
             this._httpContextAccessor = httpContextAccessor;
         }
         public async Task<IActionResult> Index() // Controller
@@ -26,7 +26,7 @@ namespace RunningWebApp.Controllers
             return View(clubs); // View
         }
 
-        public async Task<IActionResult> Detail(int id) 
+        public async Task<IActionResult> Detail(int id)
         {
             Club club = await _clubRepository.GetByIdAsync(id); // Return the first club that has given ID
             return View(club);
@@ -54,20 +54,20 @@ namespace RunningWebApp.Controllers
                     AppUserId = clubVM.AppUserId,
                     Address = new Address
                     {
-						Street = clubVM.Address.Street,
-						City = clubVM.Address.City,
+                        Street = clubVM.Address.Street,
+                        City = clubVM.Address.City,
                         State = clubVM.Address.State,
                     }
                 };
-				_clubRepository.Add(club);
-				return RedirectToAction("Index");
-			}
+                _clubRepository.Add(club);
+                return RedirectToAction("Index");
+            }
             else
             {
                 ModelState.AddModelError("", "Photo upload failed");
             }
 
-            return View(clubVM);   
+            return View(clubVM);
         }
 
         public async Task<IActionResult> Edit(int id)
@@ -110,28 +110,26 @@ namespace RunningWebApp.Controllers
                     return View(clubVM);
                 }
 
-				var photoResult = await _photoService.AddPhotoAsync(clubVM.Image);
+                var photoResult = await _photoService.AddPhotoAsync(clubVM.Image);
 
-				var club = new Club
-				{
-					Id = id,
-					Title = clubVM.Title,
-					Description = clubVM.Description,
-					Image = photoResult.Url.ToString(),
-					AddressId = clubVM.AddressId,
-					Address = clubVM.Address,
-				};
+                var club = new Club
+                {
+                    Id = id,
+                    Title = clubVM.Title,
+                    Description = clubVM.Description,
+                    Image = photoResult.Url.ToString(),
+                    AddressId = clubVM.AddressId,
+                    Address = clubVM.Address,
+                };
 
-				_clubRepository.Update(club);
+                _clubRepository.Update(club);
 
-				return RedirectToAction("Index");
-			}
+                return RedirectToAction("Index");
+            }
             else
             {
                 return View(clubVM);
             }
-
-
         }
 
         [HttpGet]
